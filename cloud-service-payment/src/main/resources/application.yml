@@ -10,16 +10,31 @@ spring:
     username: root
     password: admin
   application:
-    name: cloud-server-payment01
+    name: cloud-server-payment-8001
+
 
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 
+eureka:
+#  instance:
+#    # eureka 服务端实例名称
+#    appname: localhost
+  client:
+    #  true 将自己也注册到eureka中成为一个服务实例
+    register-with-eureka: true
+    # true 需要从eureka中获取服务实例
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka/
+
+
 # Logger Config
 logging:
   level:
     com.ycorn.payment.dao: debug
+
 
 
 

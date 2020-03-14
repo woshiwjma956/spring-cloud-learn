@@ -11,6 +11,7 @@
         <module>cloud-service-payment</module>
         <module>cloud-service-order</module>
         <module>cloud-api-common</module>
+        <module>cloud-service-eureka7001</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -92,7 +93,11 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mp.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool-all.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
