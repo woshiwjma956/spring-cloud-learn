@@ -1,0 +1,30 @@
+# payment查询
+GET http://localhost:8001/payment/1
+#Cookie: JessionId=TG4OKFVOZP6A9ML4
+#Authorization: Bearer TG4OKFVOZP6A9ML4
+Accept: application/json
+
+###
+# 创建
+POST http://localhost:8001/payment/create
+Content-Type: application/json
+
+{
+"serial":"hhe"
+}
+
+###
+# order
+
+GET http://localhost/order/consumer/payment/1
+Accept: application/json
+
+###
+POST http://localhost/order/consumer/payment/create
+Content-Type: application/json
+
+{
+"serial":"consumer"
+}
+
+###
