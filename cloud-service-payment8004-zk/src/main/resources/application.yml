@@ -1,0 +1,10 @@
+server:
+  port: 8004
+spring:
+  application:
+    name: cloud-service-payment-zk
+
+  cloud:
+    zookeeper:
+      # 配置zk连接地址, 多个ZK 以逗号分隔
+      connect-string: localhost:2181

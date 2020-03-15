@@ -89,3 +89,41 @@ eureka:
       defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka
 
 ========================================================================================
+
+Spring Cloud 整合 Zookeeper为注册中心
+
+Zookeeper 使用的是临时节点,在未收到心跳检测之后,在配置时间内会立刻从ZK上剔除
+
+采坑错误
+org.apache.zookeeper.KeeperException.create(KeeperException.java:103) ~[zookeeper-3.5.3-beta.jar:3.5.3-beta-8ce24f9e675cbefffb8f21a47e06b42864475a60]
+Spring Cloud 使用jar中自带ZK客户端工具是3.5.3-beta 如果跟实际服务器上ZK不符则需要排除该依赖,引入对应版本的ZK
+      <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zookeeper-discovery</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>zookeeper</artifactId>
+                    <groupId>org.apache.zookeeper</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.4.6</version>
+        </dependency>
+
+配置示例
+server:
+  port: 80
+spring:
+  application:
+    name: cloud-service-order-zk
+
+  cloud:
+    zookeeper:
+      # 配置zk连接地址, 多个ZK 以逗号分隔
+      connect-string: localhost:2181
+
+========================================================================================
