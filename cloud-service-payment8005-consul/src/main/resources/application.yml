@@ -1,0 +1,10 @@
+server:
+  port: 8005
+spring:
+  application:
+    name: cloud-service-payment8005-consul
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+

@@ -10,6 +10,8 @@ public class ServiceName {
 
     public final static String PAYMENT_ZK_SERVICE_NAME = "cloud-service-payment-zk";
 
+    public final static String PAYMENT_CONSUL_SERVICE_NAME = "cloud-service-payment8005-consul";
+
     public static String getPrefixUrl(String name) {
         return String.format("http://%s/", name);
     }
