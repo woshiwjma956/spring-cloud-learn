@@ -1,0 +1,91 @@
+SpringCloud,SpringBoot 选型官网介绍参考网址: http://start.spring.io/actuator/info
+
+
+IDEA run dashboard
+可以通过修改idea的workspace.xml的方式来快速打开Run Dashboard窗口
+打开workspace.xml文件之后，找到component为RunDashboard的节点处，然后在component标签里添加
+<option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+</option>
+参考 https://jingyan.baidu.com/article/ce4366495a1df73773afd3d3.html
+
+Eureka的自我保护机制
+Eureka的自我保护模式主要用于一组客户端和EurekaServer之间存在网络分区场景下进行自我保护,一旦进入保护
+模式 EurekaServer 将会尝试保护其服务注册表中的信息,不再删除服务注册表中的信息,也就是不会在注销任何微服务
+属于CAP 中的AP 分支
+Eureka 默认90S 发送一次心跳检测 如果开启自我保护机制,Eureka允许90S之后未接受到心跳,依然保留服务注册信息 分区容错性
+某时刻 某微服务不可用了 Eureka不会立刻清理,依旧会对微服务信息进行保存
+关闭自我保护机制
+Eureka:
+  server:
+    # 关闭自我保护机制
+    enable-self-preservation: false
+    # 移除服务的时间间隔
+    eviction-interval-timer-in-ms: 2000
+
+Eureka Client端
+eureka:
+  instance:
+    # 向Eureka Server 发送心跳的频率
+    lease-renewal-interval-in-seconds: 1
+    # Eureka 服务端在收到最后一次心跳后等待时间上限,超出将剔除服务
+    lease-expiration-duration-in-seconds: 2
+
+
+Eureka Server 配置文件模板:
+
+server:
+  port: 7002
+
+spring:
+  application:
+    name: cloud-server-eureka-7002
+
+eureka:
+  instance:
+    # eureka 服务端实例名称 不写默认为${spring.application.name} 大写
+    appname: eureka7002.com
+  client:
+    # 是否向注册中心注册自己 false表示不注册
+    register-with-eureka: false
+    # false 表示自己端就是注册中心,职责是维护服务实例,不需要去检索服务
+    fetch-registry: false
+    service-url:
+      defaultZone: http://eureka7001:7001/eureka/
+
+
+Eureka Client配置模板
+
+server:
+  port: 8002
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cloud-learn?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: admin
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-server-payment
+
+eureka:
+  instance:
+    # eureka 服务端实例名称 会覆盖Spring.Application.name (默认为 Spring.Application.name 全大写)展示在eureka console中
+#    appname: order
+    prefer-ip-address: true
+#   Eureka 	Status中展示的名称 替代主机名
+    instance-id: payment8002
+  client:
+    #  true 将自己也注册到eureka中成为一个服务实例
+    register-with-eureka: true
+    # true 需要从eureka中获取服务实例
+    fetch-registry: true
+    service-url:
+#      defaultZone: http://localhost:7001/eureka/
+      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka
+
+========================================================================================

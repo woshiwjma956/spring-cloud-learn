@@ -25,6 +25,11 @@ public class CommonResult<T> {
         return new CommonResult(200, "success", data);
     }
 
+    public static CommonResult success(String msg, Object data) {
+        return new CommonResult(200, msg, data);
+    }
+
+
     public static CommonResult success() {
         return new CommonResult(200, "success", null);
     }

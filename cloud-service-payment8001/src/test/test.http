@@ -1,12 +1,11 @@
 # payment查询
 GET http://localhost:8001/payment/1
-#Cookie: JessionId=TG4OKFVOZP6A9ML4
-#Authorization: Bearer TG4OKFVOZP6A9ML4
-Accept: application/json
+Accept: application/json;charset=utf-8
 
 ###
 # 创建
 POST http://localhost:8001/payment/create
+Accept: application/json;charset=utf-8
 Content-Type: application/json
 
 {
@@ -17,10 +16,12 @@ Content-Type: application/json
 # order
 
 GET http://localhost/order/consumer/payment/1
-Accept: application/json
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
 
 ###
 POST http://localhost/order/consumer/payment/create
+Accept: application/json;charset=utf-8
 Content-Type: application/json
 
 {

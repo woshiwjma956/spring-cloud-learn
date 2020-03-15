@@ -17,7 +17,7 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/order")
 public class OrderController {
-    private static final String paymentUrl = "http://localhost:8001/";
+    private static final String paymentUrl = "http://" + "cloud-server-payment".toUpperCase();
 
     @Autowired
     RestTemplate restTemplate;
@@ -25,15 +25,15 @@ public class OrderController {
 
     @GetMapping("/consumer/payment/{paymentId}")
     public CommonResult consumePaymentFindById(@PathVariable("paymentId") Long paymentId) {
-        CommonResult result = restTemplate.getForObject(paymentUrl + "payment/" + paymentId, CommonResult.class);
-        return Objects.nonNull(result) ? CommonResult.success(result.getData()) : CommonResult.error();
+        CommonResult result = restTemplate.getForObject(paymentUrl + "/payment/" + paymentId, CommonResult.class);
+        return Objects.nonNull(result) ? CommonResult.success(result.getMessage(), result.getData()) : CommonResult.error();
     }
 
     @PostMapping("/consumer/payment/create")
     public CommonResult consumePaymentCreate(@RequestBody Payment payment) {
         System.out.println(payment);
-        CommonResult result = restTemplate.postForObject(paymentUrl + "payment/create", payment, CommonResult.class);
-        return CommonResult.success(result.getData());
+        CommonResult result = restTemplate.postForObject(paymentUrl + "/payment/create", payment, CommonResult.class);
+        return Objects.nonNull(result) ? CommonResult.success(result.getMessage(), result.getData()) : CommonResult.error();
     }
 
 }

@@ -4,6 +4,7 @@ import com.ycorn.common.entity.CommonResult;
 import com.ycorn.common.entity.Payment;
 import com.ycorn.payment.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -19,14 +20,27 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    @Value("${server.port}")
+    private String port;
+
     @GetMapping("/{id}")
     public CommonResult findById(@PathVariable("id") Long id) {
-        return CommonResult.success(paymentService.findById(id));
+        Payment payment = paymentService.findById(id);
+        if (null == payment) {
+            return CommonResult.error();
+        } else {
+            return CommonResult.success("成功获取数据 port: " + port, payment);
+        }
     }
 
     @PostMapping("/create")
     public CommonResult create(@RequestBody Payment payment) {
-        return CommonResult.success(paymentService.create(payment));
+        Long result = paymentService.create(payment);
+        if (null == result) {
+            return CommonResult.error();
+        } else {
+            return CommonResult.success("成功插入数据 port: " + port, result);
+        }
     }
 
 }
