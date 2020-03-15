@@ -140,4 +140,26 @@ Zookeeper	Java	CP	支持健康检查	客户端	集成
 ========================================================================================
 
 ========================================================================================
-Discovery Client!
+Discovery Client
+
+========================================================================================
+Ribbon
+IRule接口负载规则接口
+修改Ribbon默认的轮询规则
+默认的规则不能被@ComponentScan 扫描到
+@RibbonClient(name="SERVICE_NAME",configuration=IRule.class)
+
+手动实现自定义负载均衡算法
+主要目的是体会轮询算法的原理和CAS 和 自旋锁的思想,实际开发中直接实现IRule下面的接口使用@RibbonClient注解修改轮询算法
+CompareAndSet 返回Boolean
+GetAndSet 返回之前的值
+compareAndSet：如果当前值 == 预期值，则以原子方式将该值设置为给定的更新值。这里需要注意的是这个方法的返回值实际上是是否成功修改，而与之前的值无关。
+getAndSet ：以原子方式设置为给定值，并返回以前的值。
+1.为了测试自己的轮询算法ApplicationContextBean去掉注解@LoadBalance
+2.LoadBalancer接口
+结合DiscoveryClient 选择一个服务
+ServiceInstance instances(List<ServiceInstance> serviceList);
+3.MyLB 实现LoadBalancer接口
+4.OrderController改写
+使用RestTemplate去请求LoadBalancer返回的那个ServiceInstance即可
+5.Test
