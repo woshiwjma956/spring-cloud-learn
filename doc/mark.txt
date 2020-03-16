@@ -1,5 +1,7 @@
 SpringCloud,SpringBoot 选型官网介绍参考网址: http://start.spring.io/actuator/info
 
+修改IDEA 配置
+IDEA setting -->Edit --> File Types --> ignore files and folders
 
 IDEA run dashboard
 可以通过修改idea的workspace.xml的方式来快速打开Run Dashboard窗口
@@ -163,3 +165,11 @@ ServiceInstance instances(List<ServiceInstance> serviceList);
 4.OrderController改写
 使用RestTemplate去请求LoadBalancer返回的那个ServiceInstance即可
 5.Test
+
+修改默认Ribbon的轮询策略 参考https://blog.csdn.net/wo18237095579/article/details/83384134
+方式一: Java配置文件方式
+1.创建一个@Configuration 配置文件指定全局的轮训规则
+2.保证SpringBoot启动不扫描到这个配置文件 @ComponentScan(filter={})
+3.@RibbonClient(name = "order", configuration = RibbonLoadBalanceConfiguration.class)
+
+方式二: 使用 ribbon配置文件
