@@ -245,4 +245,32 @@ feign:
 
 FeignFallBack使用注解
 @FeignClient(value = ServiceName.PAYMENT_HYSTRIX_SERVICE_NAME, fallback = PaymentServiceFeignClientFallback.class)
+
+==服务熔断== CircuitBreaker
+服务保险丝
+Open - half Open - Close
+断路器核心三参数
+sleepWindowInMilliseconds: 快照时间窗口,断路器确定是否打开需要统计一些请求和错误数据,而统计的时间范围就是快照时间窗口,默认是最近10S
+requestVolumeThreshold: 请求总数阈值,在快照时间窗口内,必须满足请求总数阈值才有资格熔断,默认20,意味着默认如果10S内,如果hystrix命令
+调用次数不足20次,即使所有请求都超时或者失败也不会打开熔断器
+errorThresholdPercentage: 错误百分比阈值,默认值50,当在快照窗口时间内,请求次数超过了阈值,超过错误率多少打开熔断器
+一段时间后默认是5S,断路器会是半开状态,断路器会让其中一个请求进行转发,如果成功关闭熔断,如果失败继续开启熔断,周而复始
+
+
+==Dashboard==
+stater-actuator 组件需要配置到微服务的包中
+========================================================================================
+Spring cloud Gateway
+
+配置文件
+
+Bean配置
+
+通过微服务名实现动态路由
+
+
+常用的Predictor
+
+自定义filter和Spring Cloud Gateway 自带的filter
+
 ========================================================================================
