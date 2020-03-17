@@ -1,11 +1,14 @@
 package com.ycorn.payment.controller;
 
+import com.mysql.jdbc.TimeUtil;
 import com.ycorn.common.entity.CommonResult;
 import com.ycorn.common.entity.Payment;
 import com.ycorn.payment.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 描述:
@@ -40,6 +43,17 @@ public class PaymentController {
             return CommonResult.error();
         } else {
             return CommonResult.success("成功插入数据 port: " + port, result);
+        }
+    }
+
+    @GetMapping("/timeout/{id}")
+    public CommonResult timeOut(@PathVariable("id") Long id) throws InterruptedException {
+        TimeUnit.SECONDS.sleep(5);
+        Payment payment = paymentService.findById(id);
+        if (null == payment) {
+            return CommonResult.error();
+        } else {
+            return CommonResult.success("成功获取数据 port But Time Out: " + port, payment);
         }
     }
 

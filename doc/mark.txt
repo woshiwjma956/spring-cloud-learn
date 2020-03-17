@@ -172,15 +172,55 @@ ServiceInstance instances(List<ServiceInstance> serviceList);
 2.保证SpringBoot启动不扫描到这个配置文件 @ComponentScan(filter={})
 3.@RibbonClient(name = "order", configuration = RibbonLoadBalanceConfiguration.class)
 
-方式二: 使用 ribbon配置文件
-
+方式二: 使用 ribbon配置文件(未测试通过)
+### 针对单个服务的 Ribbon 配置
+cloud-service-order:
+  ribbon:
+    # 基于配置文件形式的 针对单个服务的 Ribbon 负载均衡策略
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
 
 ========================================================================================
 OpenFeign
-服务调用
-超时控制
-ribbon下的2个配置
-日志增强
+
+==服务调用==
+@EnableFeignClients
+@FeignClient(name="微服务名") 参考com.ycorn.service.PaymentServiceClient
+
+==超时控制== 参考https://www.cnblogs.com/WaterGe/p/11687118.html
+默认feign为1S
+java.net.SocketTimeoutException: Read timed out 异常
+1 hystrix可配置的部分
+hystrix.command.default.execution.timeout.enable=true //为false则超时控制有ribbon控制，为true则hystrix超时和ribbon超时都是用，但是谁小谁生效，默认为true
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds=3000//熔断器的超时时长默认1秒，最常修改的参数
+circuitBreaker.requestVolumeThreshold=20 //触发熔断的最小请求次数，默认为20
+circuitBreaker.sleepWindowInMilliseconds=5000 //休眠时长，默认为5秒
+circuitBreaker.errorThresholdPercentage=50 //触发熔断的失败请求最小占比，默认50%
+2 ribbon的可配置部分
+ribbon.ReadTimeout=1000 //处理请求的超时时间，默认为1秒
+ribbon.ConnectTimeout=1000 //连接建立的超时时长，默认1秒
+ribbon.MaxAutoRetries=1 //同一台实例的最大重试次数，但是不包括首次调用，默认为1次
+ribbon.MaxAutoRetriesNextServer=0 //重试负载均衡其他实例的最大重试次数，不包括首次调用，默认为0次
+ribbon.OkToRetryOnAllOperations=false //是否对所有操作都重试，默认false
+ 3 Feign的可配置部分
+feign.hystrix.enabled=false //Feign是否启用断路器,默认为false
+feign.client.config.default.connectTimeout=10000 //Feign的连接建立超时时间，默认为10秒
+feign.client.config.default.readTimeout=60000 //Feign的请求处理超时时间，默认为60
+feign.client.config.default.retryer=feign.Retryer.Default //Feign使用默认的超时配置，在该类源码中可见，默认单次请求最大时长1秒，重试5次
+
+==日志增强==
+添加配置
+@Configuration
+public class FeignLogConfiguration {
+    @Bean
+    Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
+    }
+}
+修改yml
+# 配置feign 调用日志查看
+logging:
+  level:
+    com.ycorn.service.PaymentServiceFeginClient: debug
 
 ========================================================================================
 Hystrix

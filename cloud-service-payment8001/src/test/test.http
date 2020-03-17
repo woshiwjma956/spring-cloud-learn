@@ -13,6 +13,10 @@ Content-Type: application/json
 }
 
 ###
+GET http://localhost:8001/payment/timeout/1
+Accept: application/json;charset=utf-8
+
+###
 # order
 
 GET http://localhost/order/consumer/payment/1
@@ -27,6 +31,11 @@ Content-Type: application/json
 {
 "serial":"consumer"
 }
+
+###
+GET http://localhost/order/consumer/payment/timeout/1
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
 
 ###
 # order Zk test

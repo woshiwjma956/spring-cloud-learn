@@ -19,6 +19,7 @@
         <module>cloud-service-payment8005-consul</module>
         <module>cloud-service-order80-consul</module>
         <module>cloud-service-order80-ribbon</module>
+        <module>cloud-service-order80-fegin</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -110,11 +111,6 @@
 
     <dependencies>
         <!--
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
-        </dependency>
-
          <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
@@ -154,6 +150,11 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+
+          <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
         -->
