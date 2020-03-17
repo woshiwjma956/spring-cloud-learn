@@ -11,6 +11,11 @@ Content-Type: application/json
 {
 "serial":"hhe"
 }
+###
+# payment hystrix test
+GET http://localhost:8006/payment/error/hahah
+Accept: application/json;charset=utf-8
+
 
 ###
 GET http://localhost:8001/payment/timeout/1
@@ -52,6 +57,12 @@ Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
 ###
 # order ribbon customer loadbalancer rule
 GET http://localhost/order/useMyLoadBalancer/payment/1
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+#order hystrix test
+GET http://localhost/order/consumer/payment/errorTimeout/haha
 Accept: application/json;charset=utf-8
 Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
 

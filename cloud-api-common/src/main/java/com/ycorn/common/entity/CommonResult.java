@@ -39,17 +39,17 @@ public class CommonResult<T> {
     }
 
     public static CommonResult error(String msg) {
-        return new CommonResult(500, msg, null);
+        return new CommonResult(ErrorCode.SYSTEM_ERROR.code, msg, null);
     }
 
     public static CommonResult error() {
-        return new CommonResult(ErrorCode.SYSTEM_ERROR.code, ErrorCode.SYSTEM_ERROR.msg
-                , null);
+        return new CommonResult(ErrorCode.SYSTEM_ERROR.code, ErrorCode.SYSTEM_ERROR.msg, null);
     }
 
     @AllArgsConstructor
     enum ErrorCode {
-        SYSTEM_ERROR(500, "SYSTEM_ERROR"),;
+        SYSTEM_ERROR(500, "SYSTEM_ERROR"),
+        ;
         private final Integer code;
         private final String msg;
     }

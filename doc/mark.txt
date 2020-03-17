@@ -227,13 +227,17 @@ Hystrix
 服务提供方
 @HystrixCommand
 @EnableCircuitBreaker
-@HystrixProperties
+@HystrixProperties 参考https://blog.csdn.net/jxchallenger/article/details/99657568
+com.netflix.hystrix.contrib.javanica.conf.HystrixPropertiesManager 定义了HystrixProperties的属性
+
+
 
 客户端
 feign:
     hystrix:
         enable: true
-@EnableHystrix
+
+@EnableHystrix # 开启Hystrix功能
 服务降级 fallback
 服务熔断 CircuitBreaker
 服务限流 limit
@@ -242,3 +246,4 @@ feign:
 全局的DefaultProperties
 @DefaultProperties(defaultFallback="xxx")
 FeignFallBack
+========================================================================================

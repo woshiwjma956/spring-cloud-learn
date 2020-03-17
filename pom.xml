@@ -20,6 +20,8 @@
         <module>cloud-service-order80-consul</module>
         <module>cloud-service-order80-ribbon</module>
         <module>cloud-service-order80-fegin</module>
+        <module>cloud-service-payment8006-hystrix</module>
+        <module>cloud-service-order80-hystrix</module>
     </modules>
     <packaging>pom</packaging>
 
