@@ -230,9 +230,7 @@ Hystrix
 @HystrixProperties 参考https://blog.csdn.net/jxchallenger/article/details/99657568
 com.netflix.hystrix.contrib.javanica.conf.HystrixPropertiesManager 定义了HystrixProperties的属性
 
-
-
-客户端
+客户端 开启
 feign:
     hystrix:
         enable: true
@@ -242,8 +240,9 @@ feign:
 服务熔断 CircuitBreaker
 服务限流 limit
 
-
 全局的DefaultProperties
 @DefaultProperties(defaultFallback="xxx")
-FeignFallBack
+
+FeignFallBack使用注解
+@FeignClient(value = ServiceName.PAYMENT_HYSTRIX_SERVICE_NAME, fallback = PaymentServiceFeignClientFallback.class)
 ========================================================================================
