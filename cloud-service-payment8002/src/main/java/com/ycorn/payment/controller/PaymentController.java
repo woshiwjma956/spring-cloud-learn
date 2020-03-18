@@ -42,4 +42,11 @@ public class PaymentController {
         }
     }
 
+    @GetMapping("/circuitBreak")
+    public CommonResult testCircuitBreak(Integer index) {
+        String result = paymentService.testCircuitBreaker(index);
+        return CommonResult.success("成功访问 port: " + port, result);
+    }
+
+
 }

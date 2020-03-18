@@ -22,6 +22,8 @@
         <module>cloud-service-order80-fegin</module>
         <module>cloud-service-payment8006-hystrix</module>
         <module>cloud-service-order80-hystrix</module>
+        <module>cloud-service-hystrix-dashboard</module>
+        <module>cloud-service-turbine</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -144,6 +146,12 @@
             <artifactId>spring-cloud-starter-consul-discovery</artifactId>
         </dependency>
 
+
+          <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-turbine</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
@@ -164,7 +172,6 @@
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
         -->
-
 
     </dependencies>
 

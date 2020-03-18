@@ -15,4 +15,11 @@ public interface PaymentService {
 
     Payment findById(Long id);
 
+    /**
+     * 测试熔断
+     * @param index
+     * @return
+     */
+    String testCircuitBreaker(Integer index);
+
 }

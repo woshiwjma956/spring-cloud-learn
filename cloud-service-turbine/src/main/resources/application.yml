@@ -1,0 +1,42 @@
+
+spring:
+  application:
+    name: cloud-service-turbine
+
+eureka:
+  instance:
+    # eureka 服务端实例名称 会覆盖Spring.Application.name 展示在eureka console中
+    #    appname: order
+    prefer-ip-address: true
+    #   Eureka 	Status中展示的名称 替代主机名
+    instance-id: turbine
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+  client:
+    #  true 将自己也注册到eureka中成为一个服务实例
+    register-with-eureka: true
+    # true 需要从eureka中获取服务实例
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka/
+#      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/
+server:
+  port: 9999
+
+
+#  turbine.appConfig=shop-product-consumer-hystrix-dashboard,eureka-ribbon-consumer-threadpool
+#指定聚合哪些集群，多个使用","分割，默认为 default。可使用http://.../turbine.stream?cluster={clusterConfig 之一}访问turbine.aggregator.clusterConfig= default
+# 1. clusterNameExpression 指定集群名称，默认表达式 appName；此时：turbine.aggregator.clusterConfig 需要配置想要监控的应用名称；
+# 2. 当 clusterNameExpression: default 时，turbine.aggregator.clusterConfig 可以不写，因为默认就是 default；
+# 3. 当 clusterNameExpression: metadata['cluster']时，假设想要监控的应用配置了 eureka.instance.metadata-map.cluster: ABC，
+# 则需要配置，同时 turbine.aggregator.clusterConfig:ABC
+#  turbine.clusterNameExpression="default"
+turbine:
+  # 配置 Eureka 中的 serviceId 列表，表明监控哪些服务 逗号分隔
+  app-config: CLOUD-SERVER-PAYMENT
+  aggregator:
+    cluster-config: default
+  #指定集群名称，默认表达式 appName；此时：turbine.aggregator.clusterConfig 需要配置想要监控的应用名称；
+  cluster-name-expression: new String("default")
+  #更改turbine连接的默认uri ,默认为actuator/hystrix.stream
+  instanceUrlSuffix: hystrix.stream

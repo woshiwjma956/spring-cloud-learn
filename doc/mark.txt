@@ -255,10 +255,61 @@ requestVolumeThreshold: 请求总数阈值,在快照时间窗口内,必须满足
 调用次数不足20次,即使所有请求都超时或者失败也不会打开熔断器
 errorThresholdPercentage: 错误百分比阈值,默认值50,当在快照窗口时间内,请求次数超过了阈值,超过错误率多少打开熔断器
 一段时间后默认是5S,断路器会是半开状态,断路器会让其中一个请求进行转发,如果成功关闭熔断,如果失败继续开启熔断,周而复始
-
+ @HystrixCommand(fallbackMethod = "testCircuitBreakerFallback",
+            commandProperties = {
+                    @HystrixProperty(name = HystrixPropertiesManager.CIRCUIT_BREAKER_ENABLED, value = "true"), // 开启熔断器
+                    @HystrixProperty(name = HystrixPropertiesManager.CIRCUIT_BREAKER_REQUEST_VOLUME_THRESHOLD, value = "10"), //快照时间测量请求的数量
+                    @HystrixProperty(name = HystrixPropertiesManager.CIRCUIT_BREAKER_SLEEP_WINDOW_IN_MILLISECONDS, value = "10000"),// 快照时间
+                    @HystrixProperty(name = HystrixPropertiesManager.CIRCUIT_BREAKER_ERROR_THRESHOLD_PERCENTAGE, value = "60"),// 错误率达到多少才开启熔断器
+            })
 
 ==Dashboard==
 stater-actuator 组件需要配置到微服务的包中
+http://localhost:9001/hystrix
+SpringCloud 2.0升级的坑
+ServletRegistrationBean因为Springcloud的默认路径不是"/hystrix.stream"
+只需要再自己被监控的项目上配置下面的servlet即可
+@Bean
+public ServletRegistrationBean<HystrixMetricsStreamServlet> getServlet() {
+    HystrixMetricsStreamServlet servlet = new HystrixMetricsStreamServlet();
+    ServletRegistrationBean<HystrixMetricsStreamServlet> bean = new ServletRegistrationBean<>(servlet);
+    bean.setLoadOnStartup(1);
+    bean.addUrlMappings("/hystrix.stream");
+    bean.setName("HystrixMetricsStreamServlet");
+    return bean;
+}
+
+==Turbine==
+集群监控
+http://localhost:9999/turbine.stream
+
+=核心注解=
+@EnableTurbine
+@EnableDiscoveryClient # 需要发布到注册中心上
+
+
+=配置模板=
+#  turbine.appConfig=shop-product-consumer-hystrix-dashboard,eureka-ribbon-consumer-threadpool
+#指定聚合哪些集群，多个使用","分割，默认为 default。可使用http://.../turbine.stream?cluster={clusterConfig 之一}访问turbine.aggregator.clusterConfig= default
+# 1. clusterNameExpression 指定集群名称，默认表达式 appName；此时：turbine.aggregator.clusterConfig 需要配置想要监控的应用名称；
+# 2. 当 clusterNameExpression: default 时，turbine.aggregator.clusterConfig 可以不写，因为默认就是 default；
+# 3. 当 clusterNameExpression: metadata['cluster']时，假设想要监控的应用配置了 eureka.instance.metadata-map.cluster: ABC，
+# 则需要配置，同时 turbine.aggregator.clusterConfig:ABC
+#  turbine.clusterNameExpression="default"
+turbine:
+  # 配置 Eureka 中的 serviceId 列表，表明监控哪些服务 逗号分隔
+  app-config: CLOUD-SERVER-PAYMENT
+  aggregator:
+    cluster-config: default
+  #指定集群名称，默认表达式 appName；此时：turbine.aggregator.clusterConfig 需要配置想要监控的应用名称；
+  cluster-name-expression: new String("default")
+  #更改turbine连接的默认uri ,默认为actuator/hystrix.stream
+  instanceUrlSuffix: hystrix.stream
+
+== 采坑 ==
+SpringCloud2.0之后监控从/actuator/hystrix.stream 改为/hystrix.stream 需要修改配置文件 也保证需要配置一个servlet暴露hystrix监控
+instanceUrlSuffix: hystrix.stream
+
 ========================================================================================
 Spring cloud Gateway
 
