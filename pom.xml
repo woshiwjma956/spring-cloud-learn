@@ -24,6 +24,7 @@
         <module>cloud-service-order80-hystrix</module>
         <module>cloud-service-hystrix-dashboard</module>
         <module>cloud-service-turbine</module>
+        <module>cloud-service-gateway</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -280,6 +280,7 @@ public ServletRegistrationBean<HystrixMetricsStreamServlet> getServlet() {
 }
 
 ==Turbine==
+参考https://www.cnblogs.com/songlu/p/9977260.html
 集群监控
 http://localhost:9999/turbine.stream
 
@@ -313,15 +314,114 @@ instanceUrlSuffix: hystrix.stream
 ========================================================================================
 Spring cloud Gateway
 
-配置文件
+== 配置文件 ==
 
-Bean配置
+<--SimpleDemo-->
+  cloud:
+    gateway:
+      enabled: true
+      routes:
+        - id: baidu_route_guonei
+          uri: http://news.baidu.com/guonei
+          predicates:
+            - Path=/guonei
 
-通过微服务名实现动态路由
+== Bean配置 ==
+@Bean
+public RouteLocator baiduRoute(RouteLocatorBuilder builder) {
+    return builder.routes()
+            .route("baidu_route_guoji",
+                    r->r.path("/guoji").and().cookie("username","test")
+            .filters(f->f.addRequestHeader("addHeader","myAddHeader"))
+            .uri("http://news.baidu.com/guoji"))
+            .route("baidu_route_sport",
+                    r->r.path("/sports")
+            .uri("http://news.baidu.com/sports"))
+            .build();
+}
 
+== 通过微服务名实现动态路由 ==
+配置示例
+  cloud:
+    gateway:
+      enabled: true
+      discovery:
+        #表示gateway开启服务注册和发现功能,
+        #并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router，这个router将以服务名开头的请求路径转发到对应的服务
+        locator:
+          enabled: true
+          #表示将请求路径的服务名配置改成小写  因为服务注册的时候，向注册中心注册时将服务名转成大写的了
+          lower-case-service-id: true
+      routes:
+        - id: cloud-service-payment        # 随机取一个唯一的名字即可
+          uri: lb://CLOUD-SERVICE-PAYMENT  #代表从注册中心获取服务，且以lb(load-balance)负载均衡方式转发
+          predicates:
+            - Path=/payment/**             #表示将以/payment/**开头的请求转发到uri为lb://CLOUD-SERVICE-PAYMENT的地址上
+          filters:
+            - AddResponseHeader=My-Test-Header,testHAHAHA
+#            - StripPrefix=1 #表示将Path的路径/service01在转发前去掉，如果设置StripPrefix=2，表示将/service01/*去掉
 
-常用的Predictor
+== 常用的Predictor ==
+After: 某一个时间点之后
+格式通过JDK8的ZoneDateTime来生成
+ZonedDateTime.now().toString()
+- After=2020-03-18T15:54:19.627+08:00[Asia/Shanghai]
+
+Before: 某个时间点之前
+- Before=2017-01-20T17:42:47.789-07:00[America/Denver]
+
+Between: 某个时间点之间
+- Between=2017-01-20T17:42:47.789-07:00[America/Denver], 2017-01-21T17:42:47.789-07:00[America/Denver]
+
+Cookies: 存在某一个 cookie Key,Value 逗号分隔
+- Cookie=chocolate, ch.p
+
+Header: 请求头 Key, Value value支持正则表达式
+- Header=X-Request-Id, \d+
+
+Host: 从某一个Host(域名)定位过来 支持Regex
+- Host=**.somehost.org,**.anotherhost.org
+
+Method: 请求方法
+- Method=GET,POST
+
+Path: 常用 根据请求地址转发 多个,分隔 支持正则
+- Path=/red/{segment},/blue/{segment}
+- Path=/payment/**
+
+Query: 带某一个查询参数 支持regexp
+- Query=green
+- Query=red, gree.
+The preceding route matches if the request contained a red query parameter whose value matched the gree. regexp, so green and greet would match.
+如果请求包含red这个参数并且他的值是满足gree.这个正则规则即可,所有green和greet都可以匹配这个路由
+
+Weight: 权重
+routes:
+  - id: weight_high
+    uri: https://weighthigh.org
+    predicates:
+    - Weight=group1, 8
+  - id: weight_low
+    uri: https://weightlow.org
+    predicates:
+    - Weight=group1, 2
+This route would forward ~80% of traffic to weighthigh.org and ~20% of traffic to weighlow.org
+这个路由会转发80%的请求给weight_high 20%给low
 
 自定义filter和Spring Cloud Gateway 自带的filter
+参考https://www.cnblogs.com/ye-feng-yu/p/11111803.html
+Spring Cloud Gateway 自带的filter有很多 参考https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.1.RELEASE/reference/html/#gatewayfilter-factories
+类似添加请求头,请求参数,cookie,setStatus等功能
+常用:
+StripPrefix 用于除去Path中匹配的前缀 填入一个数字表示从/之后开始截取 0表示不截取,1表示截掉第一个/之前的路径
+如uri是 /hehe/haha/123  StripPrefix=1 则截取 /haha/123 StripPrefix=2 则截取 /123
+# 参考 源码org.springframework.cloud.gateway.filter.factory.StripPrefixGatewayFilterFactory#apply
+
+自定义GlobalGatewayFilter
+1.实现GlobalFilter, Ordered接口
+2.复写filter方法
+    chain.filter(exchange);// 传给一下个filter
+    response.setComplete(); //返回状态码不传给下一个filter 返回
+参考com.ycorn.gateway.filter.MyGlobalGatewayFilter
 
 ========================================================================================

@@ -57,4 +57,9 @@ public class PaymentController {
         }
     }
 
+    @GetMapping("/lb")
+    public CommonResult lbTest(){
+        return CommonResult.success(port);
+    }
+
 }

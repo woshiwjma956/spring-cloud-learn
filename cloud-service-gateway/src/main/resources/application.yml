@@ -1,0 +1,58 @@
+server:
+  port: 9527
+
+
+spring:
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-server-gateway
+  cloud:
+    gateway:
+      enabled: true
+      discovery:
+        #表示gateway开启服务注册和发现功能,
+        #并且spring cloud gateway自动根据服务发现为每一个服务创建了一个router，这个router将以服务名开头的请求路径转发到对应的服务
+        locator:
+          enabled: true
+          #表示将请求路径的服务名配置改成小写  因为服务注册的时候，向注册中心注册时将服务名转成大写的了
+          lower-case-service-id: true
+      routes:
+        - id: baidu_route_guonei
+          uri: http://news.baidu.com/guonei
+          predicates:
+            - Path=/guonei
+        - id: cloud-service-payment        # 随机取一个唯一的名字即可
+          uri: lb://CLOUD-SERVICE-PAYMENT  #代表从注册中心获取服务，且以lb(load-balance)负载均衡方式转发
+          predicates:
+            - Path=/payment/**             #表示将以/payment/**开头的请求转发到uri为lb://CLOUD-SERVICE-PAYMENT的地址上
+          filters:
+            - AddResponseHeader=My-Test-Header,testHAHAHA
+            - StripPrefix=1 #表示将Path的路径/service01在转发前去掉，如果设置StripPrefix=2，表示将/service01/*去掉
+
+
+eureka:
+  instance:
+    # eureka 服务端实例名称 会覆盖Spring.Application.name (默认为 Spring.Application.name 全大写)展示在eureka console中
+    #    appname: order
+    prefer-ip-address: true
+    #   Eureka 	Status中展示的名称 替代主机名
+    instance-id: gateway9527
+  client:
+    #  true 将自己也注册到eureka中成为一个服务实例
+    register-with-eureka: true
+    # true 需要从eureka中获取服务实例
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka/
+#      defaultZone: http://eureka7001.com:7001/eureka,http://eureka7002.com:7002/eureka
+
+# Logger Config
+logging:
+  level:
+    com.ycorn.payment.dao: debug
+    com.ycorn.gateway.filter.MyGlobalGatewayFilter: debug
+  config: classpath:logback-spring.xml
+
+
+
+
