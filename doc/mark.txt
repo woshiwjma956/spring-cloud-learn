@@ -425,3 +425,27 @@ StripPrefix 用于除去Path中匹配的前缀 填入一个数字表示从/之�
 参考com.ycorn.gateway.filter.MyGlobalGatewayFilter
 
 ========================================================================================
+
+Spring Cloud Config 分布式配置中心
+
+== 配置中心服务端搭建 ==
+Spring Cloud Config
+
+== 配置中心客户端搭建 ==
+
+== 整合 Spring bus 实现通知各节点动态刷新配置 ==
+整合rabbitMQ
+1. 全局刷新
+curl -X POST "http://localhost:3344/actuator/bus/refresh"
+
+2. 定点通知
+curl -X POST "http://localhost:3344/actuator/bus/refresh/{destination}"
+
+其中localhost:3344为配置中心 服务端的地址,{destination}为${spring.application.name}:${server.port}
+
+
+========================================================================================
+
+Spring Cloud Stream
+
+========================================================================================
