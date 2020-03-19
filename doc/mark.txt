@@ -530,6 +530,21 @@ curl -X POST "http://localhost:3344/actuator/bus/refresh/{destination}"
 
 其中localhost:3344为配置中心 服务端的地址,{destination}为${spring.application.name}:${server.port}
 
+== 整合 apollo == 实现分布式配置
+参考 https://mp.weixin.qq.com/s/4DuOK9bvAedr2FiPQzhRvg
+yml配置 参考
+app:
+  id: apollo-test                            #应用ID
+apollo:
+  cacheDir: D:\\software\\apollo\\cache                       #配置本地配置缓存目录
+  cluster: default                           #指定使用哪个集群的配置
+  meta: http://localhost:8080            #DEV环境配置中心地址
+  autoUpdateInjectedSpringProperties: true   #是否开启 Spring 参数自动更新
+  bootstrap:
+    enabled: true                            #是否开启 Apollo
+    namespaces: application                  #设置 Namespace
+    eagerLoad:
+      enabled: false                         #将 Apollo 加载提到初始化日志系统之前
 
 ========================================================================================
 

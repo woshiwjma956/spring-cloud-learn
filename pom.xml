@@ -28,6 +28,7 @@
         <module>cloud-service-config-server</module>
         <module>cloud-service-config-client3366</module>
         <module>cloud-service-config-client3355</module>
+        <module>cloud-service-config-client3377-apollo</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -188,7 +189,21 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+
+          <dependency>
+            <groupId>com.ctrip.framework.apollo</groupId>
+            <artifactId>apollo-client</artifactId>
+            <version>1.4.0</version>
+        </dependency>
         -->
+
+
 
 
 

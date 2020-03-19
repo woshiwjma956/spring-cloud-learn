@@ -44,3 +44,9 @@ Accept: application/json;charset=utf-8
 Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
 
 ###
+# test apollo config
+GET http://localhost:3377/configClient/config/info
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
