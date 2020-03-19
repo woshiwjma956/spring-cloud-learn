@@ -25,6 +25,9 @@
         <module>cloud-service-hystrix-dashboard</module>
         <module>cloud-service-turbine</module>
         <module>cloud-service-gateway</module>
+        <module>cloud-service-config-server</module>
+        <module>cloud-service-config-client3366</module>
+        <module>cloud-service-config-client3355</module>
     </modules>
     <packaging>pom</packaging>
 

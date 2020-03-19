@@ -1,0 +1,46 @@
+###
+# test config server
+GET http://localhost:3344/master/application-dev.yml
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+GET http://localhost:3344/master/application-prod.yml
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+GET http://localhost:3344/master/application-test.yml
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+GET http://localhost:3344/dev/application-test.yml
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+# 从configServer 动态获取配置
+GET http://localhost:3366/configClient/config/info
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+GET http://localhost:3355/configClient/config/info
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+
+###
+# 手动刷新 config client 的配置
+POST http://localhost:3366/actuator/refresh
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+# 通过spring bus   整合rabbit mq 通知config Server 由Server 统一通知客户端
+POST http://localhost:3344/actuator/bus-refresh
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###

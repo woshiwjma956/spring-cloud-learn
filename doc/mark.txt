@@ -431,10 +431,97 @@ Spring Cloud Config 分布式配置中心
 == 配置中心服务端搭建 ==
 Spring Cloud Config
 
+@SpringBootApplication
+@EnableConfigServer
+
+yml配置
+spring:
+  application:
+    name: cloud-service-config-server
+  cloud:
+    config:
+      enabled: true
+      server:
+        git:
+          uri: https://gitee.com/jianimaoju/spring-cloud-learn-config.git
+          search-paths:
+            - "spring-cloud-learn-config" # 仓库名
+      label: master
+
+访问形式
+/{application}/{profile}[/{label}]
+/{application}-{profile}.yml
+/{label}/{application}-{profile}.yml
+/{application}-{profile}.properties
+/{label}/{application}-{profile}.properties
+推荐 第三种
+http://configServerHost:port/master/application-dev.yml
+
 == 配置中心客户端搭建 ==
+bootstrap.yml 优先于application.yml 加载
+bootstrap.yml 是系统级别的配置文件 优先级最高
+application.yml 是用户级别的配置文件
+整个项目的配置文件 bootstrap.yml + application.yml 且 application.yml中的重复配置会覆盖bootstrap的下的配置文件
+bootstrap.yml 配置文件示例
+spring:
+  application:
+    name: cloud-service-config-client
+  cloud:
+    config:
+      enabled: true
+      label: master
+      uri: http://localhost:3344 # config Server Host
+      profile: dev # application-{profile}.yml 获取哪一个文件.默认default
+
+-- 手动刷新配置 --
+1.添加暴露的管理端口主要是refresh
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health","info","refresh"]
+2.在需要刷新配置文件的类加上@RefreshScope注解 表示该类如果刷新配置文件需要更新
 
 == 整合 Spring bus 实现通知各节点动态刷新配置 ==
-整合rabbitMQ
+1.添加pom
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+</dependency>
+2. Config server 和 Config Client 都注册到 Eureka 或其他注册中心
+3.修改 yml文件
+整合RabbitMq 添加MQ配置
+Config Server & Config Client 添加MQ配置
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+Config Server 暴露bus/refresh endpoint Config Server 暴露refresh endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health","info","refresh","bus-refresh"]
+4. 发送POST请求通知Config Server 让 ConfigServer 通知Client 刷新配置
+curl -X POST "http://localhost:3344/actuator/bus/refresh/{destination}"
+
+== RabbitMQ 的消息日志追踪工具 ==
+rabbitmq-plugins enable rabbitmq_tracing
+参考 https://blog.csdn.net/xuangey/article/details/91563727
+理解pattern的格式
+官网介绍：
+The firehose publishes messages to the topic exchange amq.rabbitmq.trace with
+routing key either “publish.exchangename”, for messages entering the broker, or “deliver.queuename”, for messages leaving the broker;
+大概就是抓publish匹配exchange名字，抓消费匹配队列名字。具体如下
+
+#匹配所有的消息，无论是发布还是消费的信息
+publish.# 匹配所有发布的消息。
+deliver.# 匹配所有被消费的消息。
+#.test 如果test是队列，则匹配已经被消费了的test队列的消息。如果test是exchange，则匹配所有经过该exchange的消息。
+
+==  通知方式 ==
 1. 全局刷新
 curl -X POST "http://localhost:3344/actuator/bus/refresh"
 
