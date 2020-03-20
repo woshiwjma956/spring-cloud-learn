@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cloud-service-tream-rabbitmq-consumer6688</artifactId>
+    <artifactId>cloud-service-stream-rabbitmq-consumer6688</artifactId>
 
     <dependencies>
         <!--common dependency-->
