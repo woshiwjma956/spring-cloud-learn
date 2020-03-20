@@ -12,7 +12,11 @@ spring:
   application:
     # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
     name: cloud-service-payment
-
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      probability: 1
 
 mybatis-plus:
   configuration:
