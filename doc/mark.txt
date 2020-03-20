@@ -554,28 +554,113 @@ Spring Cloud Stream
 @Input
 @Output
 @StreamListener
-Source
-Sink
 MessageBuilder
 
-消息重复消费
-分组解决
-不同组可以全面消费(重复消费)
-同一个组发生竞争关系,只有其中一个消费
+YML配置示例
+spring:
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-service-stream-rabbit-consumer
+  cloud:
+    stream:
+      binders: # 绑定器的配置
+        local_rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
+      bindings:
+        stream_provider_channel: # 表示一个通道的名字
+#          destination: stream-demo # 表示rabbitMQ中一个exchange的名字 建议不写直接用channel的Name
+          content-type: application/json
+          binder: "local_rabbit" # 设置要板顶的消息服务 找一个binders
+          group: paymentProviderGroup # 设置消息组 保证消息的持久化和防止重复消
 
-消息持久化
+发送代码Demo:
+// 用于绑定一个MessageChannel 发送数据
+public interface SourceStream {
+    String channelName= "stream_provider_channel";
 
-自定义配置分组
-自定义配置分同一个组,解决重复消费问题
+    @Output(channelName)
+    MessageChannel streamProviderChannel();
+}
 
+@EnableBinding(SourceStream.class) // 使用EnableBinding 来获取 SourceStream中绑定的channel发送数据
+public class ProviderMessageServiceImpl {
 
+    @Autowired // 直接注入即可
+    private SourceStream sourceStream;
 
-消息生产
-消息消费
+    public void send(String msg) {
+    //org.springframework.messaging.support.MessageBuilder用于构建对象
+        Message<String> message = MessageBuilder.withPayload(msg).build();
+        sourceStream.streamProviderChannel().send(message);
+    }
+}
+
+接收方代码Demo:
+// 用于绑定输入通道
+public interface DestStream {
+
+    String CHANNEL_NAME= "stream_provider_channel"; // 这里对应在rabbitMq中的Exchange的概念
+
+    @Input(CHANNEL_NAME)
+    SubscribableChannel input();;
+
+}
+
+@EnableBinding(DestStream.class)
+@Slf4j
+public class MyStreamListener {
+
+    @Value("${server.port}")
+    private String port;
+
+    @StreamListener(DestStream.CHANNEL_NAME) //核心注解用于绑定监听
+    public void receive(String msg) {
+        log.info("receive from provider" + msg + " port:" + port);
+    }
+}
+
+== 消息持久化 和 消息的重复消费 ==
+stream_provider_channel.anonymous.9e71GNKpRLShdiIwdwxHvA
+默认Spring Cloud 某一个服务会生成一个 channelName(exchangeName).anonymous.UUID的Queue
+默认不配置Group的情况下,在rabbitMQ中会生成anonymous的随机Queue,不同的Queue在绑定同一个交换机会出现消息重复消费的问题
+解决办法在yml中指定group属性,相当于指定了Queue的,就会把消费者绑定到指定Queue的队列里面 exchangeName.groupName
+
+消息的持久化 也需要配置Group 项目停止之后再次启动会消费之前已经发送给MQ中的消息,消息不丢失
+
+采坑:
+1.spring.cloud.stream.bindings.destination: 会在rabbitmq中创建一个exchange,
+但在@Input需要使用这个名字来接受消息,不能使用channelName,建议要么destinationName和channelName一样 或者不设置
+2.跳出传统的MVC思维,不需要先写接口在继承实现,如果这样Spring会抛找到2个相同的bean导致注入失败
+
 ========================================================================================
 
 Spring Cloud Sleuth
 
-Zipkin
-TranceId
-SpanId
+Zipkin Install
+1. 直接下载 Jar https://dl.bintray.com/openzipkin/maven/io/zipkin/java/zipkin-server/
+
+2. 编译安装Running from Source
+Zipkin can be run from source if you are developing new features. To achieve this, you’ll need to get Zipkin’s source and build it.
+
+# get the latest source
+git clone https://github.com/openzipkin/zipkin
+cd zipkin
+# Build the server and also make its dependencies
+./mvnw -DskipTests --also-make -pl zipkin-server clean install
+# Run the server
+java -jar ./zipkin-server/target/zipkin-server-*exec.jar
+
+== TranceId ==
+链路追踪的唯一Id,表示一次请求从客户端进入到结束返回
+
+== SpanId ==
+表示调链路轨迹中,某一个服务调用另一个服务的Id,维护的上级parentId关系,通过SpanId串联起来一条微服务调用记录
+

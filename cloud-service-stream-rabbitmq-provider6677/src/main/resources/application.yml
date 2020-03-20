@@ -1,0 +1,67 @@
+server:
+  port: 6677
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cloud-learn?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: admin
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-service-stream-rabbit-provider
+  cloud:
+    stream:
+      binders:
+        local_rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: localhost
+                port: 5672
+                username: guest
+                password: guest
+                virtual-host: /
+      bindings:
+        stream_provider_channel: # 表示一个通道的名字
+#          destination: stream-demo # 表示rabbitMQ中一个exchange的名字
+          content-type: application/json
+          binder: "local_rabbit" # 设置要板顶的消息服务 找一个binders
+          group: paymentProviderGroup # 设置消息组 保证消息的持久化和防止重复消费
+
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+eureka:
+  instance:
+    # eureka 服务端实例名称 会覆盖Spring.Application.name 展示在eureka console中
+    #    appname: order
+    prefer-ip-address: true
+    #   Eureka 	Status中展示的名称 替代主机名
+    instance-id: cloud-service-stream-rabbit-provider6677
+    # 向Eureka Server 发送心跳的频率
+    lease-renewal-interval-in-seconds: 1
+    # Eureka 服务端在收到最后一次心跳后等待时间上限,超出将剔除服务
+    lease-expiration-duration-in-seconds: 2
+
+  client:
+    #  true 将自己也注册到eureka中成为一个服务实例
+    register-with-eureka: true
+    # true 需要从eureka中获取服务实例
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:7001/eureka/
+#      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/
+
+# Logger Config
+logging:
+  level:
+    com.ycorn.payment.dao: debug
+
+#debug: true
+
+

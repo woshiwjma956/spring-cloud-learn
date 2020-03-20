@@ -29,6 +29,9 @@
         <module>cloud-service-config-client3366</module>
         <module>cloud-service-config-client3355</module>
         <module>cloud-service-config-client3377-apollo</module>
+        <module>cloud-service-stream-rabbitmq-provider6677</module>
+        <module>cloud-service-tream-rabbitmq-consumer6688</module>
+        <module>cloud-service-stream-rabbitmq-consumer6699</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -214,7 +217,6 @@
         </dependency>
 
         -->
-
 
 
     </dependencies>

@@ -1,0 +1,8 @@
+###
+# test config server
+GET http://localhost:6677/payment/sendMsg?msg=hahaha
+Accept: application/json;charset=utf-8
+Accept-Language:fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5
+
+###
+
