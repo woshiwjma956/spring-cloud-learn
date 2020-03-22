@@ -680,3 +680,30 @@ cr - Client Receive: 客户端最终收到从服务器响应的请求. 这是一
 ========================================================================================
 
 
+Spring Cloud Alibaba Nacos
+
+Nacos Config
+${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
+
+分组管理
+Namespace Group DataId
+
+== DataID ==
+根据不同的 active 读取不同的DataId配置文件
+
+== Group ==
+
+== Namespace ==
+
+== 集群配置 ==
+cluster.conf 类似zk的集群配置
+一个节点HOST:PORT 一行一个
+
+== 持久化 ==
+建配置文件保存在MySql中
+
+== nacos 整合 keepalived 可高可用==
+https://blog.csdn.net/qq_36268452/article/details/104357165
+========================================================================================
+
+
