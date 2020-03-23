@@ -1,0 +1,35 @@
+server:
+  port: 8001
+
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cloud-learn?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: admin
+  zipkin:
+    base-url: http://localhost:9411
+  sleuth:
+    sampler:
+      probability: 1
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+# Logger Config
+logging:
+  level:
+    com.ycorn.payment.dao: debug
+
+# 暴露监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+
+

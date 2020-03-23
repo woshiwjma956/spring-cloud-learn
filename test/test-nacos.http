@@ -1,0 +1,15 @@
+# payment查询
+GET http://localhost:8002/payment/nacos/config
+Accept: application/json;charset=utf-8
+
+###
+# payment查询
+GET http://localhost:8001/payment/nacos/config
+Accept: application/json;charset=utf-8
+
+###
+# order
+GET http://localhost/order/order/payment/nacosConfig
+Accept: application/json;charset=utf-8
+
+###

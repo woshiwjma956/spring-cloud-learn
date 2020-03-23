@@ -32,6 +32,9 @@
         <module>cloud-service-stream-rabbitmq-provider6677</module>
         <module>cloud-service-stream-rabbitmq-consumer6688</module>
         <module>cloud-service-stream-rabbitmq-consumer6699</module>
+        <module>cloud-service-alibaba-nacos-config-provider8001</module>
+        <module>cloud-service-alibaba-nacos-config-provider8002</module>
+        <module>cloud-service-alibaba-nacos-config-order80</module>
     </modules>
     <packaging>pom</packaging>
 

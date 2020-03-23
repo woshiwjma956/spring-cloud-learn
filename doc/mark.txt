@@ -679,31 +679,140 @@ cr - Client Receive: 客户端最终收到从服务器响应的请求. 这是一
 
 ========================================================================================
 
-
 Spring Cloud Alibaba Nacos
 
-Nacos Config
-${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
+官方文档 https://nacos.io/zh-cn/docs/what-is-nacos.html
 
-分组管理
+配置文件参考:
+bootstrap.yml 要求nacos配置先与application.yml之前加载
+spring:
+  profiles:
+    active: test
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-service-alibaba-payment
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: db04e794-7fea-4aec-840b-ef2b2e23f137
+      config:
+        server-addr: localhost:8848
+        namespace: db04e794-7fea-4aec-840b-ef2b2e23f137  # 配置nacos上创建的命名空间的ID
+        file-extension: yaml  # 采坑 目前2.1.0 yml需要写成yaml
+        group: DEFAULT_GROUP
+
+
+== Nacos Config 文件获取规则 ==
+默认规则
+${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
+DataId为:
+以后上面的配置的DataID为cloud-service-alibaba-payment-test.yaml 需要再nacos生成配置文件的时候在db04e794-7fea-4aec-840b-ef2b2e23f137这个
+名称空间下创建一个DataID 叫cloud-service-alibaba-payment-test.yaml 的yaml配置文件 才能正常的被Nacos正常加载
+
+== 分组管理 ==
 Namespace Group DataId
+通过三个维度进行对分布式配置中心的管理
+范围是Namespace包Group包DataID
 
 == DataID ==
 根据不同的 active 读取不同的DataId配置文件
+默认:${spring.application.name}-${spring.profile.active}.${spring.cloud.nacos.config.file-extension}
 
 == Group ==
+在同一个NameSpace下进行GROUP分组便于精细的管理
 
 == Namespace ==
+命名空间 nacos支持根据命名管理不同的分布式配置中心和服务发现,方便在Dashboard中分类查看
+同一个命名空间的微服务优先被调用
+例如按机房部署的城市分成GZ 广州 和 CD 成都 在GZ这个namespace空间下的微服务会优先调用GZ下的
 
 == 集群配置 ==
 cluster.conf 类似zk的集群配置
 一个节点HOST:PORT 一行一个
 
 == 持久化 ==
-建配置文件保存在MySql中
+在0.7版本之前，在单机模式时nacos使用嵌入式数据库实现数据的存储，不方便观察数据存储的基本情况。0.7版本增加了支持mysql数据源能力，具体的操作步骤：
+
+1.安装数据库，版本要求：5.6.5+
+2.初始化mysql数据库，数据库初始化文件：nacos-mysql.sql
+3.修改conf/application.properties文件，增加支持mysql数据源配置（目前只支持mysql），添加mysql数据源的url、用户名和密码。
+spring.datasource.platform=mysql
+
+db.num=1
+db.url.0=jdbc:mysql://11.162.196.16:3306/nacos_devtest?characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true
+db.user=nacos_devtest
+db.password=youdontknow
+再以单机模式启动nacos，nacos所有写嵌入式数据库的数据都写到了mysql
+
 
 == nacos 整合 keepalived 可高可用==
-https://blog.csdn.net/qq_36268452/article/details/104357165
+实现通过 keepalived 保证nacos的高可用
+参考 但是失败..https://blog.csdn.net/qq_36268452/article/details/104357165
+
+keepalived 配置 测试通过
+keepalived 参考https://www.cnblogs.com/clsn/p/8052649.html#auto_id_25
+keepalived 配置详细 参考https://blog.csdn.net/mofiu/article/details/76644012
+global_defs {
+   router_id lb01
+}
+
+vrrp_script check {
+   script "/etc/keepalived/chk_nacos.sh"
+   interval 2 
+   weight 2
+}
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens33
+    virtual_router_id 51
+    priority 150
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.132.111
+    }
+    track_script {
+       check
+    }
+}
+vrrp_instance VI_2 {
+    state BACKUP
+    interface ens33
+    virtual_router_id 52
+    priority 100
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+	192.168.132.222
+    }
+   track_script {	
+       check
+   }
+}
+
+chk_nacos.sh 文件 chmod +x
+
+#!/bin/bash
+COUNT=$(ps -ef | grep nacos |grep -v "chk_nacos" | grep -v "grep" | wc -l )
+echo "nacos服务数量为：$COUNT"
+#判断nacos 是否都挂掉了
+if [ $COUNT -lt 1 ]; then    
+   echo “nacos服务失败，让出master”
+   exit 1
+else
+   echo "检测成功"
+   exit 0
+fi
+
+
 ========================================================================================
 
 
