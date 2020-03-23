@@ -1,0 +1,7 @@
+# sentinel 测试
+GET http://localhost:8004/payment/sentinel/testA
+Accept: application/json;charset=utf-8
+
+###
+GET http://localhost:8004/payment/sentinel/testB
+Accept: application/json;charset=utf-8

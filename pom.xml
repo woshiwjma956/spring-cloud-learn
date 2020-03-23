@@ -35,6 +35,7 @@
         <module>cloud-service-alibaba-nacos-config-provider8001</module>
         <module>cloud-service-alibaba-nacos-config-provider8002</module>
         <module>cloud-service-alibaba-nacos-config-order80</module>
+        <module>cloud-service-alibaba-sentinel-provider8004</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -226,6 +227,15 @@
          <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+         <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-datasource-nacos</artifactId>
         </dependency>
         -->
 

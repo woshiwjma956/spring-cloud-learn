@@ -1,0 +1,22 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-service-alibaba-payment
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        namespace: db04e794-7fea-4aec-840b-ef2b2e23f137  # 配置nacos上创建的命名空间的ID
+        file-extension: yaml  # 采坑 目前2.1.0 yml需要写成yaml
+        group: DEFAULT_GROUP
+    sentinel:
+      enabled: true
+      transport:
+        port: 8719
+        dashboard: localhost:8080 # sentinel dashboard的连接地址
+      flow:
+        coldFactor: 3
