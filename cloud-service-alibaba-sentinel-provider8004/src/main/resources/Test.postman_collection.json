@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "3c3c8052-3cc7-4dfd-987b-b531576f16e1",
+		"name": "Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "sentinel thread threshold test",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8004/payment/sentinel/threadThreshold",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"payment",
+						"sentinel",
+						"threadThreshold"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "payment/sentinel/QPS",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8004/payment/sentinel/QPS",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"payment",
+						"sentinel",
+						"QPS"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "warmup",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8004/payment/sentinel/warmUp",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"payment",
+						"sentinel",
+						"warmUp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ratelimit",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8004/payment/sentinel/rateLimit",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"payment",
+						"sentinel",
+						"rateLimit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Circuit Breaking RT",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8004/circuitBreaking/sentinel/RT",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"circuitBreaking",
+						"sentinel",
+						"RT"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "exceptionRate",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8004/circuitBreaking/sentinel/exceptionRate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"circuitBreaking",
+						"sentinel",
+						"exceptionRate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "exceptionCount",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8004/circuitBreaking/sentinel/exceptionCount",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8004",
+					"path": [
+						"circuitBreaking",
+						"sentinel",
+						"exceptionCount"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
