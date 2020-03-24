@@ -3,7 +3,7 @@ spring:
     active: dev
   application:
     # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
-    name: cloud-service-alibaba-payment
+    name: cloud-service-alibaba-sentinel-provider
   cloud:
     nacos:
       discovery:

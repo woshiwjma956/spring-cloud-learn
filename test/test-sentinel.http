@@ -1,7 +1,44 @@
 # sentinel 测试
-GET http://localhost:8004/payment/sentinel/testA
+GET http://localhost:8004/payment/sentinel/QPS
 Accept: application/json;charset=utf-8
 
 ###
-GET http://localhost:8004/payment/sentinel/testB
+GET http://localhost:8004/payment/sentinel/threadThreshold
 Accept: application/json;charset=utf-8
+
+###
+GET http://localhost:8004/payment/sentinel/warmUp
+Accept: application/json;charset=utf-8
+
+###
+# circuit breaking
+GET http://localhost:8004/circuitBreaking/sentinel/RT
+Accept: application/json;charset=utf-8
+
+###
+GET http://localhost:8004/circuitBreaking/sentinel/exceptionRate
+Accept: application/json;charset=utf-8
+
+###
+GET http://localhost:8004/circuitBreaking/sentinel/exceptionCount
+Accept: application/json;charset=utf-8
+
+### hotkey
+GET http://localhost:8004/hotkey/sentinel/hotkey
+
+### hotkey fail
+GET http://localhost:8004/hotkey/sentinel/hotkey?p1=sad
+
+### hotkey pass
+GET http://localhost:8004/hotkey/sentinel/hotkey?p2=sad
+
+### hotkey fail
+GET http://localhost:8004/hotkey/sentinel/hotkey?p2=sad&p1=2
+
+### hotkey special value
+GET http://localhost:8004/hotkey/sentinel/hotkey?p3=3123&p1=specialValue&p2=123
+
+###
+
+
+
