@@ -817,18 +817,7 @@ fi
 
 Spring Cloud Alibaba Sentinel
 
-== 流控 flow control ==
-原理是监控应用流量的 QPS 或并发线程数等指标，当达到指定的阈值时对流量进行控制，以避免被瞬时的流量高峰冲垮，从而保障应用的高可用性。
-Sentinel 支持的流控规则限制 QPS 和 并发线程数,支持流控效果有直接拒绝、Warm Up、匀速排队
-
-限流的直接表现是在执行 Entry nodeA = SphU.entry(resourceName) 的时候抛出 FlowException 异常。FlowException 是 BlockException 的子类，您可以捕捉 BlockException 来自定义被限流之后的处理逻辑。
-一条限流规则主要由下面几个因素组成，我们可以组合这些元素来实现不同的限流效果：
-    resource：资源名，即限流规则的作用对象
-    count: 限流阈值
-    grade: 限流阈值类型（QPS 或并发线程数）
-    limitApp: 流控针对的调用来源，若为 default 则不区分调用来源
-    strategy: 调用关系限流策略
-    controlBehavior: 流量控制效果（直接拒绝、Warm Up、匀速排队）
+== 流控 flow limit ==
 
 QPS直接失败 QPS每秒请求数
 当调用该API的QPS达到阈值时进行限流
@@ -836,42 +825,39 @@ QPS直接失败 QPS每秒请求数
 == 线程数直接失败 ==
 当调用该API的线程数达到阈值时进行限流
 
-== QPS 限流和 线程数限流的区别 ==
 QPS限流是在请求还未到服务的之前根据每秒请求个数进行限流
 线程限流是在请求已经放行到服务之后,服务器进行处理这个请求使用的线程数,当该请求需要耗时的时候,效果明显
 
 == 关联 ==
-选择流控模式为关联时,参数相当于是配置的上流的阈值
-如testB 中 选择流控模式为关联, 关联testA 设置了QPS 为1. testA资源的QPS达到阈值1的时候,testB限流..
 当关联资源达到阈值时,就限流自己
 当与A关联的资源B达到阈值后,就限流A自己
 POSTMAN中Collection创建多线程访问集合组
 
+== 直接失败 ==
+DefaultController
 
-== 流控效果 ==
+== 链路 ==
 
-== 直接拒绝（RuleConstant.CONTROL_BEHAVIOR_DEFAULT）方式 ==
-是默认的流量控制方式，当QPS超过任意规则的阈值后，新的请求就会被立即拒绝，拒绝方式为抛出FlowException。这种方式适用于对系统处理能力确切已知的情况下，比如通过压测确定了系统的准确水位时。
+== 流控限制效果 ==
 
-==  Warm Up（RuleConstant.CONTROL_BEHAVIOR_WARM_UP）方式  ==
-    即预热/冷启动方式。当系统长期处于低水位的情况下，当流量突然增加时，直接把系统拉升到高水位可能瞬间把系统压垮。通过"冷启动"，让通过的流量缓慢增加，在一定时间内逐渐增加到阈值上限，给冷系统一个预热的时间，避免冷系统被压垮。
-    ColdFactor 冷因子默认为3
-    即请求QPS 从 threshold / 3开始,经预热时长逐渐升至设定的QPS阈值
-    WarmUpController
-    案例:
-    QPS阈值为10,预热时长为5
-    系统初始化阈值为 10/3 约等于3 ,然后经过5秒后阈值才慢慢升高到10
-    使用场景:
-    秒杀系统在开启的瞬间,会有很多流量上来,预热的方式是为了保护系统,慢慢的流量放进来,慢慢的把阈值增长到设定的阈值
+== 预热  warm up==
+ColdFactor 冷因子默认为3
+即请求QPS 从 threshold / 3开始,经预热时长逐渐升至设定的QPS阈值
+WarmUpController
+案例:
+QPS阈值为10,预热时长为5
+系统初始化阈值为 10/3 约等于3 ,然后经过5秒后阈值才慢慢升高到10
 
-==  匀速排队（RuleConstant.CONTROL_BEHAVIOR_RATE_LIMITER）方式  ==
-    会严格控制请求通过的间隔时间，也即是让请求以均匀的速度通过，对应的是漏桶算法。
-    匀速排队,让请求以均匀的速度通过,阈值类型只能是QPS
-    设置含义: 但每秒请求达到阈值的时候,就开始排队等待,等到时间超过设置的超时时间就抛异常
-    漏桶算法
-    主要用于处理间隔性突发的流量,例如消息队列
-    比如某一秒有大量请求,然后之后几秒没有请求进来,希望系统能在接下来的空闲期间逐渐处理请求,而不是第一秒直接拒绝多余的请求
-    RateLimiterController
+使用场景:
+秒杀系统在开启的瞬间,会有很多流量上来,预热的方式是为了保护系统,慢慢的流量放进来,慢慢的把阈值增长到设定的阈值
+
+== 排队等待 ==
+匀速排队,让请求以均匀的速度通过,阈值类型只能是QPS
+设置含义: 但每秒请求达到阈值的时候,就开始排队等待,等到时间超过设置的超时时间就抛异常
+漏桶算法
+主要用于处理间隔性突发的流量,例如消息队列
+比如某一秒有大量请求,然后之后几秒没有请求进来,希望系统能在接下来的空闲期间逐渐处理请求,而不是第一秒直接拒绝多余的请求
+RateLimiterController
 
 == 降级 ==
 
@@ -884,18 +870,78 @@ RT平均响应时间 (DEGRADE_GRADE_RT)：
 异常数 (DEGRADE_GRADE_EXCEPTION_COUNT)：
     当资源近 1 分钟的异常数目超过阈值之后会进行熔断。注意由于统计时间窗口是分钟级别的，若 timeWindow 小于 60s，则结束熔断状态后仍可能再进入熔断状态。
 
+测试在被ControllerAdvice包裹之后的降级策略
+
 == Sentinel 热点Key 降级 ==
 BlockException
-
-热点参数限流会统计传入参数中的热点参数，并根据配置的限流阈值与模式，对包含热点参数的资源调用进行限流。热点参数限流可以看做是一种特殊的流量控制，仅对包含热点参数的资源调用生效。
-
-热点Key 的配置一定要配合@SentinelResource(value="resourceName",blockHandler="handlerXXX")
+热点Key 的配置一定要配合@SentinelResource(blockHandler="handlerXXX")
 @SentinelResource 主管配置出错,运行时出错该走异常走异常
 
 参数例外项
-配置某一个索引的参数当时具体的某一个值的时候,对阈值进行调整
 
-采坑 需要配置@SentinelResource中的value 才能在DashBoard中正常配置热点降级
+== Sentinel 全局配置 ==
 
-== 测试在被ControllerAdvice包裹之后的降级策略 ==
-经测试如果被AdviceController 捕获到的异常 不会被sentinel监控到 会被sentinel直接认为是正常返回能放过
+== @SentinelResource ==
+不支持private方法
+@SentinelResource(value="resourceName",blockHandlerClass=MyBlockHandler.class,blockHandler="StaticMethodName_In_MyBlockHander")
+blockHandlerClass中的处理异常处理方法必须是静态的且与被保护的方法返回值一致
+
+
+== Sentinel 熔断 ==
+fallback 管 java RuntimeException
+blockHandler 管 sentinel 配置控制配置违规 如流控 热点流控
+
+如果fallback和blockHandler都配置了,则会被限流降级而抛出BlockException,只会进入blockHandler逻辑处理,不会走fallback逻辑
+
+== exceptionsToIgnore ==
+
+== sentinel 整合 openFeign + fallback ==
+feign:
+    sentinel:
+        enable: true
+
+== sentinel 规则持久化 ==
+官网推荐 sentinel规则持久化到nacos中
+<dependency>
+      <groupId>com.alibaba.csp</groupId>
+      <artifactId>sentinel-datasource-nacos</artifactId>
+ </dependency>
+
+spring:
+  cloud:
+    sentinel:
+      datasource:
+        my_flow:
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-flow-rules
+            groupId: SENTINEL_GROUP
+            # 规则类型，取值见：org.springframework.cloud.alibaba.sentinel.datasource.RuleType
+            rule_type: flow
+        my_degrade:
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-degrade-rules
+            groupId: SENTINEL_GROUP
+            rule-type: degrade
+
+nacos: 配置 选json
+[
+    {
+        "resource": "/rateLimit/byUrl",
+        "limitApp" : "default",
+        "grade": 1,
+        "count" : 1,
+        "strategy": 0,
+        "controlBehavior" : 0,
+        "clusterMode": false
+    }
+]
+resource： 资源名称
+limitApp： 来源应用
+grade： 阈值类型，0表示线程数，1表示 QPS
+count: 单机阈值
+strategy: 流控模式， 0 - 表示直接，1表示关联，2表示链路
+controlBehavior： 流控效果，0表示快速失败，1表示Warm up , 2表示排队
+clusterMode： 是否集群。
+== 分布式事务 Seata ==
