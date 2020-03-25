@@ -36,6 +36,8 @@
         <module>cloud-service-alibaba-nacos-config-provider8002</module>
         <module>cloud-service-alibaba-nacos-config-order80</module>
         <module>cloud-service-alibaba-sentinel-provider8004</module>
+        <module>cloud-service-alibaba-sentinel-provider8005</module>
+        <module>cloud-service-alibaba-sentinel-order84</module>
     </modules>
     <packaging>pom</packaging>
 

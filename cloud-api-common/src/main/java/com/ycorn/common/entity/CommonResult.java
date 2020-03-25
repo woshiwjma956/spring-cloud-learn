@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommonResult<T> {
+public class CommonResult {
 
     private Integer code;
 
     private String message;
 
-    private T data;
+    private Object data;
 
     public static CommonResult success(Object data) {
         return new CommonResult(200, "success", data);

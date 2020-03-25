@@ -38,6 +38,22 @@ GET http://localhost:8004/hotkey/sentinel/hotkey?p2=sad&p1=2
 ### hotkey special value
 GET http://localhost:8004/hotkey/sentinel/hotkey?p3=3123&p1=specialValue&p2=123
 
+### fallback blockhandler test
+GET http://localhost:8005/sentinel/testCircuitBreaking/1
+Accept: application/json;charset=utf-8
+
+### fallback bloack handler ribbon
+GET http://localhost:84/order/ribbon/consumeSentinelCircuitBreaking/12
+Accept: application/json;charset=utf-8
+
+### fallback bloack handler feign
+GET http://localhost:84/order/feign/consumeSentinelCircuitBreaking/22
+Accept: application/json;charset=utf-8
+
+### exception Ignore test
+GET http://localhost:84/order/testExceptionIgnore/4
+Accept: application/json;charset=utf-8
+
 ###
 
 

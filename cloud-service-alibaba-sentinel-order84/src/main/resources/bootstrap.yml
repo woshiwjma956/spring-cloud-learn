@@ -1,0 +1,43 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-service-alibaba-sentinel-consumer
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        namespace: 69139da5-7421-43bc-ae38-2f00450198fa  # 配置nacos上创建的命名空间的ID
+        file-extension: yaml  # 采坑 目前2.1.0 yml需要写成yaml
+        group: DEFAULT_GROUP
+    sentinel:
+      enabled: true
+      transport:
+        port: 8719
+        dashboard: localhost:8080 # sentinel dashboard的连接地址
+      flow:
+        coldFactor: 3
+      datasource:
+        # 配置Sentinel 持久化规则到nacos
+        order_flow_rule:
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-flow-rules
+            groupId: SENTINEL_GROUP
+            namespace: 69139da5-7421-43bc-ae38-2f00450198fa
+            # 规则类型，取值见：org.springframework.cloud.alibaba.sentinel.datasource.RuleType
+            rule_type: flow
+        order_degrade_rule:
+          nacos:
+            server-addr: localhost:8848
+            dataId: ${spring.application.name}-degrade-rules
+            groupId: SENTINEL_GROUP
+            namespace: 69139da5-7421-43bc-ae38-2f00450198fa
+            rule-type: degrade
+
+feign:
+  sentinel:
+    enabled: true
