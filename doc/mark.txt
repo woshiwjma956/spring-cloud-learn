@@ -960,6 +960,8 @@ spring:
             rule-type: degrade
 
 nacos: 配置 选json
+规则配置JSON 参考org.springframework.cloud.alibaba.sentinel.datasource.RuleType 下的具体规则POJO中的属性
+流控规则JSON 示例
 [
     {
         "resource": "/rateLimit/byUrl",
@@ -971,6 +973,13 @@ nacos: 配置 选json
         "clusterMode": false
     }
 ]
+降级规则JSON 示例
+[{
+    "resource": "feigin_consumeSentinelCircuitBreaking",
+	"count": 0.3,
+	"grade": 1,
+	"timeWindow": 10
+}]
 resource： 资源名称
 limitApp： 来源应用
 grade： 阈值类型，0表示线程数，1表示 QPS
