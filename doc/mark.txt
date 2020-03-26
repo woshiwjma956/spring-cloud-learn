@@ -991,3 +991,129 @@ clusterMode： 是否集群。
 
 
 == 分布式事务 Seata ==
+
+== 核心概念 ==
+TC - 事务协调者 (Transaction Coordinator)
+维护全局和分支事务的状态，驱动全局事务提交或回滚。
+
+TM - 事务管理器 (Transaction Manager)
+定义全局事务的范围：开始全局事务、提交或回滚全局事务。
+
+RM - 资源管理器 (Resource Manager)
+管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务提交或回滚。
+
+== Seata 服务器配置启动 ==
+1.1.0 配置参考 https://seata.io/zh-cn/docs/user/configurations.html
+file.conf  主要需要修改Seata 的配置信息保存到MySql中 修改自己的MySql Connection info
+此处我删除file存储模式的配置.如需要参考原始配置文件 将微服务事务信息保存到 global_table branch_table lock_table进行维护
+
+1. 如果是注册中心使用file 修改file.conf文件
+注意!!如果注册中心使用nacos 需要将script 脚本中的 nacos.conf 中的所有配置修改成自己需要的配置.需要修改
+store.mode=db
+store.db.url=jdbc:mysql://127.0.0.1:3306/seata?useUnicode=true
+store.db.user=root
+store.db.password=admin
+service.vgroup_mapping.my_test_tx_group=default
+这几个属性
+
+store {
+  ## store mode: file、db
+  mode = "db"
+
+  ## database store property
+  db {
+    ## the implement of javax.sql.DataSource, such as DruidDataSource(druid)/BasicDataSource(dbcp) etc.
+    datasource = "druid"
+    ## mysql/oracle/h2/oceanbase etc.
+    dbType = "mysql"
+    driverClassName = "com.mysql.jdbc.Driver"
+    url = "jdbc:mysql://127.0.0.1:3306/seata"
+    user = "root"
+    password = "admin"
+    minConn = 1
+    maxConn = 10
+    globalTable = "global_table"
+    branchTable = "branch_table"
+    lockTable = "lock_table"
+    queryLimit = 100
+  }
+}
+
+2. 核心配置文件register.conf
+配置Seata的分布式管理注册中心地址和配置地址 这里选用nacos 配置nacos serverAddress 不需要添加 http://头 默认他会去找http://
+此处我删除了除了Nacos以外的所有配置. 如需要参考源文件
+需要注意的是这里指定的namespace 需要跟客户端的 namespace 相同. 稳妥保证seata-server 启动使用的registry.conf 原封不动拷贝到
+客户端classpath://路径下 本质上让seata客户端直接从nacos中拉取配置.保存到一个ConcurrentMap中
+// 此处配置注册中心
+registry {
+  # file 、nacos 、eureka、redis、zk、consul、etcd3、sofa
+  type = "nacos"
+
+  nacos {
+    serverAddr = "localhost:8848"
+    namespace = "c2db930a-182b-401b-9835-550aa80d21af"
+    cluster = "default"
+  }
+
+}
+
+核心注意点!!! 因为这里客户端的配置直接决定了配置从哪里获取 如果选了nacos必须保证再nacos的指定的namespace上存在需要的配置 通过官网的
+script脚本初始化nacos配置,如果选择type=file 需要把配置写在classpath下file.conf文件
+config {
+  # file、nacos 、apollo、zk、consul、etcd3
+  type = "file"
+
+  nacos {
+    serverAddr = "localhost:8848"
+    namespace = "c2db930a-182b-401b-9835-550aa80d21af"
+    group = "SEATA_GROUP"
+  }
+}
+
+== 采坑 ==
+1.!!巨坑如果想要把seata中的配置 使用nacos来作为配置中心(如果registry.conf下的config标签中的type选择的是nacos) 需要执行nacos 的init脚本(sh或者py脚本都可以),将需要的服务端和客户端在file.conf配置中的信息配置到nacos中!!
+2. 采坑在1.0.0之后 vgroup_mapping 改成了vgroupMapping.xxxx 驼峰式
+service.vgroupMapping.my_test_tx_group
+@GlobalTransactional 保证分布式全局的事务
+3. 在高并发的情况下如果出现afterImage 匹配不上的时候就无法回滚到beforeImage 需要人工介入处理...
+4. 0.9.0的建表SQL中 global_table中的application_id 字符串长度好像不够
+
+== Seata AT模式 核心原理 简析 ==
+https://seata.io/zh-cn/docs/overview/what-is-seata.html
+
+AT 核心概念 beforeImage  AfterImage
+分阶段提交
+一阶段：业务数据和回滚日志记录在同一个本地事务中提交，释放本地锁和连接资源。
+二阶段：
+提交异步化，非常快速地完成。
+回滚通过一阶段的回滚日志进行反向补偿。
+
+写隔离
+一阶段本地事务提交前，需要确保先拿到 全局锁 。
+拿不到 全局锁 ，不能提交本地事务。
+拿 全局锁 的尝试被限制在一定范围内，超出范围将放弃，并回滚本地事务，释放本地锁。
+
+示例:
+业务表：product
+
+Field	Type	Key
+id	bigint(20)	PRI
+name	varchar(100)
+since	varchar(100)
+AT 分支事务的业务逻辑：
+
+update product set name = 'GTS' where name = 'TXC
+一阶段
+过程：
+前置镜像阶段
+1.解析 SQL：得到 SQL 的类型（UPDATE），表（product），条件（where name = 'TXC'）等相关的信息。
+2.查询前镜像：根据解析得到的条件信息，生成查询语句，定位数据。
+select id, name, since from product where name = 'TXC';
+保存beforeImage 用于如果出现异常回滚到前置镜像
+后置镜像阶段
+3.执行业务 SQL：更新这条记录的 name 为 'GTS'。
+4.查询后镜像：根据前镜像的结果，通过 主键 定位数据。
+select id, name, since from product where id = 1`;得到后镜像：
+在更新完成之后立刻通过主键定位到新的记录 生成后置镜像 用于校验是否是脏数据,如果在高并发情况下出现下次想要回滚的数据已经变了.需要人工干预
+二阶段
+5. 删除

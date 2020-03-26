@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    # 应用名字要相同 注册到eureka才认为是同一个服务..即服务的高可用
+    name: cloud-service-alibaba-seata-storage
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+#        namespace: c2db930a-182b-401b-9835-550aa80d21af
+      config:
+        server-addr: localhost:8848
+#        namespace: c2db930a-182b-401b-9835-550aa80d21af  # 配置nacos上创建的命名空间的ID
+        file-extension: yaml  # 采坑 目前2.1.0 yml需要写成yaml
+        group: DEFAULT_GROUP
+    alibaba:
+      seata: # 微服务项目全局唯一的XID 事务ID 由 TM (Transaction Manager 发起)  TC (Transaction Coordinator)维护全局的事务
+        tx-service-group: my_test_tx_group # 自定义事务组名称需要 seata-service 中的对应
+
+
+mic-services:
+  payment: payment
+  order: order

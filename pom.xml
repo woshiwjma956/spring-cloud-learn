@@ -38,6 +38,9 @@
         <module>cloud-service-alibaba-sentinel-provider8004</module>
         <module>cloud-service-alibaba-sentinel-provider8005</module>
         <module>cloud-service-alibaba-sentinel-order84</module>
+        <module>cloud-service-alibaba-seata-order85</module>
+        <module>cloud-service-alibaba-seata-storage8099</module>
+        <module>cloud-service-alibaba-seata-account8088</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -258,6 +261,7 @@
         </dependency>
 
         -->
+
 
     </dependencies>
 

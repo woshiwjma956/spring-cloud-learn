@@ -1,0 +1,34 @@
+server:
+  port: 8088
+
+spring:
+  zipkin:
+    base-url: http://localhost:9411
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seata_account?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: admin
+  sleuth:
+    sampler:
+      probability: 1
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+
+# Logger Config
+logging:
+  level:
+    com.ycorn.dao: debug
+
+# 暴露监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+
+
