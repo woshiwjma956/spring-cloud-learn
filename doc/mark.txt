@@ -726,8 +726,7 @@ Namespace Group DataId
 
 == Namespace ==
 命名空间 nacos支持根据命名管理不同的分布式配置中心和服务发现,方便在Dashboard中分类查看
-同一个命名空间的微服务优先被调用
-例如按机房部署的城市分成GZ 广州 和 CD 成都 在GZ这个namespace空间下的微服务会优先调用GZ下的
+微服务之间的调用通过namespace进行隔离,不同namespace之间的服务不能调用,同一个namespace下不同group的可以调用
 
 == 集群配置 ==
 cluster.conf 类似zk的集群配置
@@ -873,10 +872,11 @@ RT平均响应时间 (DEGRADE_GRADE_RT)：
     当资源近 1 分钟的异常数目超过阈值之后会进行熔断。注意由于统计时间窗口是分钟级别的，若 timeWindow 小于 60s，则结束熔断状态后仍可能再进入熔断状态。
 
 测试在被ControllerAdvice包裹之后的降级策略
+经测试被ControllerAdvice包裹的策略正常处理之后不会被sentinel作为异常记录
 
 == Sentinel 热点Key 降级 ==
 BlockException
-热点Key 的配置一定要配合@SentinelResource(blockHandler="handlerXXX")
+热点Key 的配置一定要配合@SentinelResource(resource="xxx",blockHandler="handlerXXX")
 @SentinelResource 主管配置出错,运行时出错该走异常走异常
 
 == 参数例外项 ==
